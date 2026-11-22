@@ -1,10 +1,6 @@
 # Fábrica de Sillones – OLAP & Relational Database Architecture
 
-Migración de un conjunto de datos desnormalizados hacia un modelo relacional estricto en 3FN, y posterior despliegue de un Data Warehouse (OLAP) para inteligencia de negocios.
-
-![SQL Server](https://img.shields.io/badge/SQL_Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white)
-![T-SQL](https://img.shields.io/badge/T--SQL-005C84?style=for-the-badge&logo=microsoft-sql-server&logoColor=white)
-![Data Engineering](https://img.shields.io/badge/Data_Engineering-2C3E50?style=for-the-badge)
+Migración de ~522.000 filas de un conjunto de datos desnormalizado hacia un modelo transaccional de 21 tablas en 3FN sobre SQL Server, y posterior diseño de un esquema en estrella (OLAP) con 8 dimensiones, 5 tablas de hechos y 10 vistas de KPI de negocio, con procesos ETL en T-SQL.
 
 ## 📑 Índice
 - [El Problema y la Motivación](#-el-problema-y-la-motivación)
@@ -19,14 +15,14 @@ Migración de un conjunto de datos desnormalizados hacia un modelo relacional es
 El sistema de datos original de la fábrica presentaba serias anomalías de inserción, actualización y borrado al almacenar toda la información operativa en estructuras planas y desnormalizadas. Además de la pérdida de integridad referencial, esto generaba cuellos de botella críticos a la hora de procesar métricas de facturación sobre cientos de miles de registros.
 
 El objetivo de ingeniería de este proyecto fue doble:
-1. Diseñar un sistema **OLTP transaccional** robusto capaz de mantener la consistencia operativa en tiempo real con alto volumen de relaciones (ej: tablas de detalle con +216.000 registros).
+1. Diseñar un sistema **OLTP transaccional** robusto capaz de mantener la consistencia operativa en tiempo real con alto volumen de relaciones (ej: la tabla `MaterialPorSillon` con 216.498 registros).
 2. Desarrollar un **modelo dimensional OLAP** (Star Schema) independiente, optimizado para resolver consultas analíticas pesadas (10 vistas analíticas críticas) sin degradar el rendimiento del entorno transaccional.
 
 ## 🏗️ Tech Stack y Arquitectura
 
-*   ![SQL Server](https://img.shields.io/badge/-SQL_Server-CC2927?style=flat-square&logo=microsoft-sql-server&logoColor=white) **SQL Server / T-SQL:** Motor de base de datos principal, elegido por su robusto soporte para Procedimientos Almacenados (SP) y Triggers en el manejo de cargas intensivas.
-*   ![Data Modeling](https://img.shields.io/badge/-Data_Modeling-4CAF50?style=flat-square) **Arquitectura OLTP:** Diseño entidad-relación (ER) normalizado hasta la Tercera Forma Normal (3FN). Resolvió redundancias e inconsistencias sintácticas mediante restricciones lógicas e índices.
-*   ![OLAP](https://img.shields.io/badge/-OLAP_Data_Warehouse-0078D4?style=flat-square) **Arquitectura OLAP:** Implementación de un modelo dimensional en estrella separando tablas de hechos (ventas, compras, pedidos) y dimensiones (tiempo, cliente, sucursal, etc.), logrando una reducción drástica en los tiempos de respuesta para las vistas de inteligencia de negocios.
+*   **SQL Server / T-SQL:** Motor de base de datos principal; los procedimientos almacenados y los triggers encapsulan la creación del esquema, la migración y la actualización de totales.
+*   **Arquitectura OLTP:** Diseño entidad-relación (ER) normalizado hasta la Tercera Forma Normal (3FN). Resuelve redundancias e inconsistencias mediante restricciones y datos depurados en la migración.
+*   **Arquitectura OLAP:** Implementación de un modelo dimensional en estrella con 5 tablas de hechos (ventas, compras, pedidos, envíos y ventas por modelo) y 8 dimensiones (tiempo, cliente, ubicación, sucursal, modelo de sillón, tipo de material, estado del pedido y turno de venta), sobre las que se calculan 10 vistas de KPI.
 
 ## ⚡ Features Clave
 
@@ -58,7 +54,7 @@ Las rutinas de creación y migración están pensadas para ser ejecutadas en un 
 
 ```bash
 # 1. Clonar el repositorio
-git clone https://github.com/[Usuario]/Fabrica-de-Sillones-TP-BBDD.git
+git clone https://github.com/tsorren/Fabrica-de-Sillones-TP-BBDD.git
 cd Fabrica-de-Sillones-TP-BBDD
 
 # 2. Abrir SQL Server Management Studio (SSMS) o Azure Data Studio
